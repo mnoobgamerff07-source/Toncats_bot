@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+<title>TON CATS</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#060d26;--bg2:#0f2a7a;--card:#13265f;--card2:#1b3585;--line:#2f50ad;--cy:#3fd0ff;--gold:#ffc83d;--ink:#fff;--sub:#a3b8ee;
+color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at 50% 28%,#1d4fd0 0,transparent 55%),linear-gradient(180deg,var(--bg2),var(--bg1) 85%);color:var(--ink);font-family:Nunito,"Trebuchet MS",system-ui,sans-serif;font-weight:700;display:flex;justify-content:center;overflow:hidden}
+.stars{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(1.5px 1.5px at 30px 40px,rgba(255,255,255,.7),transparent),radial-gradient(1px 1px at 110px 100px,rgba(160,220,255,.8),transparent),radial-gradient(1.5px 1.5px at 170px 20px,rgba(255,255,255,.6),transparent);background-size:200px 150px}
+.app{position:relative;z-index:1;width:100%;max-width:480px;height:100%;display:flex;flex-direction:column}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:2px solid var(--line);border-radius:20px;box-shadow:0 4px 0 #091a4a}
+.top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 6px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:900;font-size:20px}
+.brand svg{width:38px;height:38px}
+.pill{padding:8px 14px;font-size:13px;font-weight:800;cursor:pointer;border-radius:999px}
+main{flex:1;overflow-y:auto;padding:6px 16px 14px}
+.view{display:none}.view.on{display:block}
+h2{font-size:28px;font-weight:900;margin:2px 0 14px}
+.btn{font:inherit;font-weight:900;font-size:15px;color:#4a2a00;border:0;border-radius:14px;padding:11px 16px;cursor:pointer;background:linear-gradient(180deg,#ffe27a,#ffb61f);box-shadow:0 4px 0 #b36b00;transition:transform .08s,box-shadow .08s}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 #b36b00}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sec{color:#03324f;background:linear-gradient(180deg,#8ae8ff,#25b7f0);box-shadow:0 4px 0 #0b6f9d}
+.btn.sec:active:not(:disabled){box-shadow:0 1px 0 #0b6f9d}
+.btn.big{width:100%;padding:15px;font-size:17px;margin-top:10px}
+.chips{display:flex;gap:8px;margin-bottom:8px}
+.chips div{flex:1;text-align:center;padding:7px 4px;font-size:13px;font-weight:800;border-radius:14px}
+.balbig{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 2px}
+.balbig svg{width:46px;height:46px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.25))}
+.balbig b{font-size:50px;font-weight:900;line-height:1;text-shadow:0 4px 0 rgba(0,0,0,.3)}
+.lvl{padding:0 6px;margin:6px 0}
+.lvl span{display:block;text-align:center;font-size:13px;color:var(--sub);margin-bottom:5px}
+.bar{height:14px;border-radius:9px;background:#091a4a;border:2px solid #0a1d52;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(180deg,#ffe27a,#ffb61f);transition:width .2s}
+.stage{position:relative;display:flex;justify-content:center;align-items:center;padding:14px 0 18px}
+.aura{position:absolute;width:min(78vw,42vh,330px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(63,208,255,.55),rgba(63,208,255,0) 68%)}
+.base{position:absolute;bottom:6px;width:min(52vw,26vh,200px);height:22px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.5),transparent 70%)}
+#cat{position:relative;width:min(60vw,32vh,250px);aspect-ratio:1;border:0;background:none;cursor:pointer;touch-action:manipulation;transition:transform .08s}
+#cat svg{width:100%;height:100%;filter:drop-shadow(0 8px 0 rgba(4,20,60,.55)) drop-shadow(0 0 22px rgba(63,208,255,.55))}
+#cat.hit{animation:squish .16s}
+@keyframes squish{50%{transform:scale(1.06,.92)}}
+.fly{position:absolute;font-weight:900;font-size:28px;color:#fff;-webkit-text-stroke:2px #0a1d52;paint-order:stroke fill;pointer-events:none;animation:up .8s forwards}
+@keyframes up{to{transform:translateY(-100px);opacity:0}}
+.energy{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:800}
+.energy .bar{flex:1}.energy .bar i{background:linear-gradient(180deg,#8ae8ff,#25b7f0);width:100%}
+.row{display:flex;align-items:center;gap:12px;padding:12px;margin-bottom:12px}
+.ic{width:46px;height:46px;border-radius:14px;flex:none;display:grid;place-items:center;font-size:22px;background:#0a1d52;border:2px solid var(--line)}
+.ic svg{width:34px;height:34px}
+.tx{flex:1;font-size:16px;font-weight:900}.tx small{display:block;color:var(--sub);font-weight:700;font-size:13px;margin-top:1px}
+.mcard{padding:18px 16px;text-align:center;margin-bottom:14px}
+.mcat{width:120px;height:120px;margin:0 auto 6px}
+.mcat svg{width:100%;height:100%;filter:drop-shadow(0 6px 0 rgba(4,20,60,.5)) drop-shadow(0 0 18px rgba(63,208,255,.5))}
+.mining .mcat svg{animation:bob 1s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-4px)}}
+.mnum{display:flex;align-items:center;justify-content:center;gap:8px;margin:4px 0}
+.mnum svg{width:34px;height:34px}.mnum b{font-size:34px;font-weight:900}
+.mcard small{display:block;color:var(--sub);font-size:13px;margin:4px 0 10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stats div{background:#0a1d52;border-radius:12px;padding:8px 4px;font-size:15px;font-weight:900}
+.stats span{display:block;color:var(--sub);font-size:11px;font-weight:700}
+.pack{padding:12px;margin-bottom:14px;display:flex;align-items:center;gap:12px;position:relative}
+.pack.hot{border-color:var(--gold)}
+.pack .amt{font-size:22px;font-weight:900}
+.tag{position:absolute;top:-11px;right:14px;background:var(--gold);color:#4a2a00;border-radius:999px;font-size:11px;font-weight:900;padding:2px 10px}
+.chip{display:inline-block;padding:7px 14px;font-size:14px;font-weight:800;border-radius:999px;margin-bottom:14px}
+input{width:100%;padding:13px;border-radius:12px;border:2px solid var(--line);background:#091a4a;color:var(--ink);font:inherit;font-size:17px;margin:8px 0}
+.panel{padding:14px;margin-bottom:14px;font-size:14px;line-height:1.5}
+.panel p,.msg{font-size:13px;min-height:18px;margin-top:6px}
+.two{display:grid;gap:10px;margin-bottom:12px}.two .btn{margin-top:0}
+.ok{color:#5df2a8}.bad{color:#ff8593}
+.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:#0a1a4d;border-top:2px solid var(--line)}
+.nav button{background:none;border:0;border-radius:14px;color:var(--sub);font:inherit;font-weight:800;font-size:11px;padding:5px 0;cursor:pointer;display:flex;flex-direction:column;align-items:center}
+.nav button span{font-size:22px}
+.nav button.on{color:#fff;background:#1b3585;box-shadow:inset 0 -3px 0 var(--gold)}
+:focus-visible{outline:3px solid var(--cy);outline-offset:2px}
+a.btn{display:block;text-align:center;text-decoration:none}
+.addr{background:#091a4a;border:2px solid var(--line);border-radius:12px;padding:10px;margin:10px 0;font-size:12px;word-break:break-all;user-select:all}
+.hint{text-align:center;color:var(--sub);font-size:13px;margin:-6px 0 8px}
+.gate,.splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;transition:opacity .6s,visibility .6s}
+.gate{z-index:40;padding:20px;background:rgba(6,13,38,.9)}
+.off{opacity:0;visibility:hidden}
+.gcard{width:100%;max-width:380px;padding:26px 20px;text-align:center}
+.gcard svg{width:92px;height:92px;margin-bottom:10px;filter:drop-shadow(0 0 18px rgba(63,208,255,.7))}
+.gcard h2{font-size:22px;margin:0 0 8px}.gcard p.d{color:var(--sub);font-size:14px;line-height:1.5}.gcard .msg{text-align:center}
+.splash{z-index:50;flex-direction:column;gap:20px;animation:splashOut .5s 2.4s forwards;background:radial-gradient(ellipse at 50% 40%,#1d4fd0 0,transparent 60%),linear-gradient(180deg,var(--bg2),var(--bg1))}
+.slogo{width:150px;height:150px;filter:drop-shadow(0 8px 0 rgba(4,20,60,.5)) drop-shadow(0 0 34px rgba(63,208,255,.8));animation:pop .9s cubic-bezier(.2,.9,.3,1.3) both,bob 2s ease-in-out .9s infinite}
+@keyframes pop{from{transform:scale(.2) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
+.stitle{font-size:32px;font-weight:900;letter-spacing:1px;opacity:0;animation:fadeUp .5s .6s forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.sbar{width:min(60vw,230px);height:12px;border-radius:9px;background:#091a4a;border:2px solid #0a1d52;overflow:hidden}
+.sbar i{display:block;height:100%;width:0;background:linear-gradient(180deg,#ffe27a,#ffb61f);animation:load 1.6s .2s ease-in-out forwards}
+@keyframes splashOut{to{opacity:0;visibility:hidden;pointer-events:none}}
+@keyframes load{to{width:100%}}
+.stext{color:var(--sub);font-size:14px;margin-top:-8px}
+@media (prefers-reduced-motion:reduce){.slogo,.sbar i,.mining .mcat svg,.fly,#cat.hit{animation:none}.stitle{animation:none;opacity:1}.sbar i{width:100%}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="hd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fe8ff"/><stop offset="1" stop-color="#1b8fe8"/></linearGradient>
+<linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe98a"/><stop offset="1" stop-color="#ffab00"/></linearGradient>
+<symbol id="logo" viewBox="0 0 100 100"><path d="M10 8 L35 24 Q50 20 65 24 L90 8 L92 56 Q92 92 50 93 Q8 92 8 56 Z" fill="url(#hd)" stroke="#072a4d" stroke-width="6" stroke-linejoin="round"/><path d="M17 20 L30 28 L17 40 Z M83 20 L70 28 L83 40 Z" fill="#0b4a80" opacity=".55"/><ellipse cx="30" cy="38" rx="10" ry="5" fill="#fff" opacity=".35" transform="rotate(-25 30 38)"/><rect x="22" y="42" width="56" height="38" rx="10" fill="#072a4d" stroke="#0f5a9c" stroke-width="2"/><text x="50" y="58" font-size="14" font-weight="900" fill="#3fd0ff" text-anchor="middle" font-family="Nunito,Trebuchet MS,sans-serif">TON</text><text x="50" y="73" font-size="14" font-weight="900" fill="#3fd0ff" text-anchor="middle" font-family="Nunito,Trebuchet MS,sans-serif">CATS</text></symbol>
+<symbol id="coin" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="url(#gd)" stroke="#a85d00" stroke-width="5"/><circle cx="50" cy="50" r="35" fill="none" stroke="#fff3b0" stroke-opacity=".85" stroke-width="3"/><g fill="#a85d00"><ellipse cx="50" cy="62" rx="14" ry="11"/><circle cx="32" cy="48" r="6"/><circle cx="43" cy="39" r="6"/><circle cx="57" cy="39" r="6"/><circle cx="68" cy="48" r="6"/></g></symbol>
+</defs></svg>
+
+<div class="gate" id="lock" hidden><div class="gcard card"><h2>Open in Telegram</h2><p class="d">Please open this app from the TON CATS bot inside Telegram.</p></div></div>
+
+<div class="gate" id="gate"><div class="gcard card"><svg viewBox="0 0 100 100"><use href="#logo"/></svg><h2>Join our channel to start</h2><p class="d">Join the TON CATS channel to unlock mining, tasks and rewards.</p><a class="btn big" id="gjoin" href="https://t.me/Toncats_news" target="_blank" rel="noopener">Join channel</a><button class="btn big sec" id="gchk">I joined, check</button><p class="msg" id="gmsg"></p></div></div>
+
+<div class="splash" id="splash" aria-label="Loading TON CATS"><svg class="slogo" viewBox="0 0 100 100"><use href="#logo"/></svg><div class="stitle">TON CATS</div><div class="sbar"><i></i></div><div class="stext">Starting your mining bot…</div></div>
+
+<div class="stars" aria-hidden="true"></div>
+<div class="app">
+  <div class="top"><div class="brand"><svg viewBox="0 0 100 100"><use href="#logo"/></svg>TON CATS</div></div>
+  <main>
+    <section class="view on" id="mine">
+      <div class="chips"><div class="card">🏅 <span id="lname">Kitten</span></div><div class="card">⛏️ <span id="hrate">+120/h</span></div></div>
+      <div class="balbig"><svg viewBox="0 0 100 100"><use href="#coin"/></svg><b id="bal">0</b></div>
+      <div class="lvl"><span id="lnext">0 / 500</span><div class="bar"><i id="fill"></i></div></div>
+      
+      <h2>Mining</h2>
+      <div class="mcard card" id="rig"><div class="mcat"><svg viewBox="0 0 100 100"><use href="#logo"/></svg></div>
+        <div class="mnum"><svg viewBox="0 0 100 100"><use href="#coin"/></svg><b id="macc">0.00</b></div>
+        <small id="mtime">Sessions run for 4 hours</small>
+        <div class="bar"><i id="mfill"></i></div>
+        <div class="stats"><div><span>Rate</span><b id="mrate">120/h</b></div><div><span>Level</span><b id="mlv">1</b></div><div><span>Per day</span><b id="mday">2,880</b></div></div>
+        <button class="btn big sec" id="mbtn">Start mining</button><button class="btn big" id="mclaim">Claim</button><p class="msg" id="mmsg"></p></div>
+      <div class="row card"><div class="ic">⚡</div><div class="tx">Upgrade miner<small id="mnext">More CATS every hour</small></div><button class="btn sec" id="mup">Upgrade</button></div>
+    </section>
+
+    <section class="view" id="buy">
+      <h2>Buy CATS</h2>
+      <div class="chip card">🔒 Bought CATS work in the game but cannot be withdrawn</div>
+      <div class="pack card"><div class="ic"><svg viewBox="0 0 100 100"><use href="#coin"/></svg></div><div class="tx"><div class="amt">10,000</div><small>Kitten pack</small></div><button class="btn" data-ton="0.1" data-cats="10000" data-pack="kitten">0.10 TON</button></div>
+      <div class="pack card hot"><span class="tag">+20% bonus</span><div class="ic"><svg viewBox="0 0 100 100"><use href="#coin"/></svg></div><div class="tx"><div class="amt">60,000</div><small>Tabby pack</small></div><button class="btn" data-ton="0.5" data-cats="60000" data-pack="tabby">0.50 TON</button></div>
+      <div class="pack card"><span class="tag">+40% bonus</span><div class="ic"><svg viewBox="0 0 100 100"><use href="#coin"/></svg></div><div class="tx"><div class="amt">140,000</div><small>Lion pack</small></div><button class="btn" data-ton="1" data-cats="140000" data-pack="lion">1.00 TON</button></div>
+      <p class="msg" id="bmsg"></p>
+      <div class="panel card" id="bpay" hidden><span id="bpaytext"></span><div class="addr" id="baddr"></div><button class="btn sec" id="bcopy">Copy address</button><button class="btn big" id="bcheck">I paid, check</button></div>
+    </section>
+
+    <section class="view" id="earn">
+      <h2>Earn</h2>
+      <div class="row card"><div class="ic">📣</div><div class="tx">Join TON CATS channel<small>+2,500 CATS</small></div><button class="btn" data-task="2500" data-name="channel">Join</button></div>
+      <div class="row card"><div class="ic">🐦</div><div class="tx">Follow on X<small>+1,500 CATS</small></div><button class="btn" data-task="1500" data-name="x">Follow</button></div>
+      <div class="row card"><div class="ic">📅</div><div class="tx">Daily check-in<small>+500 CATS · once a day (resets 00:00 UTC)</small></div><button class="btn" data-task="500" data-name="daily">Claim</button></div>
+      <div class="card" id="refcard" style="padding:14px;margin-bottom:12px"><div class="tx" style="font-size:18px">🐱 Invite friends<small>Get 5,000 CATS for every friend who joins the channel. No limit.</small></div>
+        <div class="stats"><div><span>Friends</span><b id="rcount">0</b></div><div><span>Earned</span><b id="rearn">0</b></div><div><span>Per invite</span><b>5,000</b></div></div>
+        <div class="addr" id="rlink"></div><button class="btn big" id="rshare">Invite friends</button><button class="btn big sec" id="invite">Copy link</button></div>
+      <p class="msg" id="emsg"></p>
+    </section>
+
+    <section class="view" id="wal">
+      <h2>Wallet</h2>
+      <div class="row card"><div class="ic"><svg viewBox="0 0 100 100"><use href="#coin"/></svg></div><div class="tx">CATS balance<small id="wbal">0 CATS</small></div></div>
+      <div class="row card"><div class="ic">💎</div><div class="tx">TON in your wallet<small id="wton">—</small></div></div>
+      <div class="row card"><div class="ic">🔐</div><div class="tx">Wallet status<small id="wst">Not connected</small></div></div>
+      <button class="btn big" id="conn">Connect Tonkeeper wallet</button>
+      <div class="panel card" id="cbox" hidden>Automatic connect is not available here. Copy your wallet address in Tonkeeper and paste it here.<input id="caddr" placeholder="UQ… your wallet address"><button class="btn big" id="csave">Save wallet</button><p id="cmsg"></p></div>
+      <div class="panel card" id="vbox" hidden>Pay 0.05 TON from your connected wallet to verify it. This unlocks withdraw. The app checks the payment automatically.<div class="addr" id="addrtxt"></div><button class="btn sec" id="copyaddr">Copy address</button><p id="vmsg"></p><button class="btn big" id="verify">Pay 0.05 TON in Tonkeeper</button><button class="btn big sec" id="vcheck">I paid, check</button></div>
+      <div class="two" id="dw" hidden><p class="msg" id="wprog"></p><button class="btn big" id="wdo">Request withdraw (min 100,000)</button></div>
+      <div class="panel card" id="panel" hidden><b id="ptitle"></b><input id="amt" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Amount"><button class="btn big" id="pgo">Confirm</button><p id="pmsg"></p></div>
+      <div class="panel card" id="wlistbox" hidden><b>Withdraw requests</b><div id="wlist" style="white-space:pre-line;font-size:14px;margin-top:6px"></div></div>
+    </section>
+  </main>
+  <nav class="nav">
+    <button class="on" data-v="mine"><span>⛏️</span>Mine</button>
+    <button data-v="buy"><span>🛒</span>Buy</button>
+    <button data-v="earn"><span>🎁</span>Earn</button>
+    <button data-v="wal"><span>👛</span>Wallet</button>
+  </nav>
+</div>
+<script>
+const tg=window.Telegram&&window.Telegram.WebApp;
+let INIT=(tg&&tg.initData)||"";
+const qs=new URLSearchParams(location.search);
+if(!INIT&&qs.get("dev"))INIT="dev:"+qs.get("dev");
+const UID=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user&&tg.initDataUnsafe.user.id)||(INIT.startsWith("dev:")?INIT.slice(4):"");
+let bal=0,locked=0,walletTon=null,balAddr=null,wlist=[],tc=null,doneTasks=[],demoDone={},inviteLink="",refCount=0,refEarn=0,mlv=1,pend=0,sess=0,run=false,last=Date.now(),tonBal=0,wstate=0,uaddr='',mode='dep',useApi=false,paid=false;
+const $=s=>document.querySelector(s),CAP=4*3600e3;
+const DATA_V="reset-1",BOT="Toncats_bot",myLink=()=>"https://t.me/"+BOT+(UID?"?startapp=ref_"+UID:"");
+const X_URL="https://x.com/MRahamn63264",today=()=>new Date().toISOString().slice(0,10);
+const CHANNEL="https://t.me/Toncats_news",ADDR="UQCdOfpGQHU6QriP09V-m2ACftXhQYwEy-lkzP5OO0nMy_4B";
+const levels=[["Kitten",500],["Tabby",5000],["Lynx",25000],["Lion",100000]];
+const fmt=n=>n.toLocaleString(undefined,{maximumFractionDigits:1});
+try{if(tg){tg.ready();tg.expand()}}catch(e){}
+if(!(tg&&tg.initData))try{const s=JSON.parse(localStorage.getItem("tc")||"null");if(s&&s.v===DATA_V){bal=s.bal||0;locked=s.locked||0;demoDone=s.demoDone||{};mlv=s.mlv||1;pend=s.pend||0;sess=s.sess||0;run=!!s.run;last=s.last||Date.now();tonBal=s.tonBal||0;wstate=s.wstate||0;uaddr=s.uaddr||""}}catch(e){}
+
+/* ---- server API (used when the backend is running, otherwise local demo) ---- */
+async function call(path,body){
+  const r=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json","X-Init-Data":INIT},body:body?JSON.stringify(body):undefined});
+  let j={};try{j=await r.json()}catch(e){}
+  if(!r.ok){const e=new Error(j.error||"Request failed ("+r.status+")");e.status=r.status;e.hasError=!!j.error;throw e}
+  return j}
+function applyState(s){
+  bal=s.balance;locked=s.locked||0;doneTasks=s.tasks_done||[];wlist=s.withdrawals||[];inviteLink=s.invite_link||"";refCount=s.referrals||0;refEarn=s.referral_earned||0;tonBal=s.ton;mlv=s.level;pend=s.pending;run=s.mining||s.session_full;
+  sess=run?(s.session_full?CAP:CAP-s.seconds_left*1000):0;last=Date.now();
+  uaddr=s.wallet||"";wstate=!s.wallet?0:s.verified?2:1;wrender();mrender()}
+async function act(path,el,body,okText){
+  try{applyState(await call(path,body));if(el){el.className="msg ok";el.textContent=okText||""}return true}
+  catch(e){if(el){el.className="msg bad";el.textContent=e.message}return false}}
+function openTg(u){try{if(tg&&tg.openTelegramLink)tg.openTelegramLink(u);else window.open(u,"_blank")}catch(e){window.open(u,"_blank")}}
+function openExt(u){try{if(tg&&tg.openLink)tg.openLink(u);else window.open(u,"_blank")}catch(e){window.open(u,"_blank")}}
+const tonLink=(a,t)=>"https://app.tonkeeper.com/transfer/"+ADDR+"?amount="+Math.round(a*1e9)+"&text="+encodeURIComponent(t);
+
+/* ---- UI ---- */
+function go(v){if(v==="wal"&&uaddr)loadWalletTon();document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("on",x.dataset.v==v));document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id==v))}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>go(b.dataset.v));
+function render(){
+  $("#bal").textContent=fmt(bal);
+  $("#wbal").textContent=fmt(bal)+" CATS · withdrawable "+fmt(Math.max(0,bal-locked))+(locked?" · bought "+fmt(locked)+" can't be withdrawn":"")+" · min 100,000";
+  let i=levels.findIndex(l=>bal<l[1]);if(i<0)i=levels.length-1;
+  const prev=i?levels[i-1][1]:0,next=levels[i][1];
+  $("#lname").textContent=levels[i][0];$("#lnext").textContent=fmt(bal)+" / "+next.toLocaleString();
+  $("#fill").style.width=Math.min(100,(bal-prev)/(next-prev)*100)+"%";
+  $("#wton").textContent=walletTon==null?"—":walletTon.toFixed(3)+" TON";
+  const free=Math.max(0,bal-locked);$("#wdo").disabled=free<100000;$("#wprog").textContent="Withdrawable "+fmt(free)+" / 100,000 CATS"+(free>=100000?" · you can request a withdraw now":"");
+  $("#wlistbox").hidden=!wlist.length;
+  $("#wlist").textContent=wlist.map(w=>"#"+w.id+" · "+Number(w.amount).toLocaleString()+" CATS · "+({pending:"⏳ waiting for admin",paid:"✅ paid",rejected:"❌ rejected, CATS refunded"}[w.status]||w.status)).join("\n");
+  if(!useApi)doneTasks=Object.keys(demoDone).filter(k=>demoDone[k]==="once"||demoDone[k]===today());
+  $("#rlink").textContent=inviteLink||myLink();$("#rcount").textContent=refCount;$("#rearn").textContent=refEarn.toLocaleString();taskUI();
+}
+const rate=()=>120*mlv;
+function tick(){const n=Date.now();if(run&&sess<CAP){const dt=Math.max(0,Math.min(n-last,CAP-sess));pend+=rate()*dt/3600e3;sess+=dt}last=n;
+  if(!useApi){try{localStorage.setItem("tc",JSON.stringify({v:DATA_V,bal,locked,demoDone,mlv,pend,sess,run,last,tonBal,wstate,uaddr}))}catch(e){}}}
+function mrender(){
+  tick();const left=Math.max(0,CAP-sess),r=rate();
+  $("#macc").textContent=pend.toFixed(2);$("#mfill").style.width=sess/CAP*100+"%";
+  $("#rig").classList.toggle("mining",run&&left>0);
+  $("#mrate").textContent=r.toFixed(1)+"/h";$("#hrate").textContent="+"+r.toFixed(1)+"/h";$("#mlv").textContent=mlv;$("#mday").textContent=Math.round(r*24).toLocaleString();
+  $("#mup").textContent="Upgrade "+(mlv*1000).toLocaleString();$("#mnext").textContent="Lv "+mlv+" → "+(mlv+1)+" · costs "+(mlv*1000).toLocaleString()+" CATS from balance · +120/h";
+  $("#mbtn").textContent=run&&left>0?"Mining…":run?"Session full, restart":"Start mining";$("#mbtn").disabled=run&&left>0;
+  $("#mclaim").textContent="Claim "+Math.floor(pend+1e-9).toLocaleString()+" CATS";$("#mclaim").disabled=pend<1-1e-9;
+  $("#mtime").textContent=!run?"Start mining to earn CATS every hour":left?"Session ends in "+Math.floor(left/3600e3)+"h "+Math.floor(left%3600e3/60e3)+"m":"Session full. Claim to start again";
+}
+$("#mbtn").onclick=async()=>{
+  if(useApi){await act("/api/mining/start",$("#mmsg"));return}
+  if(!run||sess>=CAP){run=true;last=Date.now();sess=0}mrender()};
+$("#mclaim").onclick=async()=>{
+  if(useApi){await act("/api/mining/claim",$("#mmsg"),undefined,"Claimed.");return}
+  tick();const g=Math.floor(pend+1e-9);bal+=g;pend=Math.max(0,pend-g);render();mrender()};
+$("#mup").onclick=async()=>{
+  if(useApi){await act("/api/mining/upgrade",$("#mmsg"),undefined,"Miner upgraded.");return}
+  const c=mlv*1000;if(bal>=c){const u=Math.min(locked,c);locked-=u;bal-=c;mlv++;render()}else{$("#mmsg").className="msg bad";$("#mmsg").textContent="Not enough CATS. Need "+c.toLocaleString()}mrender()};
+setInterval(mrender,1000);
+
+function taskUI(){document.querySelectorAll("[data-task]").forEach(b=>{const d=doneTasks.includes(b.dataset.name);b.disabled=d;if(d)b.textContent="Done";else if(b.dataset.name==="daily")b.textContent="Claim"})}
+document.querySelectorAll("[data-task]").forEach(b=>b.onclick=async()=>{
+  if(b.disabled)return;const n=b.dataset.name,m=$("#emsg"),reward="+"+(+b.dataset.task).toLocaleString()+" CATS added to your balance.";
+  if((n==="channel"||n==="x")&&!b.dataset.opened){
+    if(n==="channel")openTg(CHANNEL);else openExt(X_URL);
+    b.dataset.opened="1";b.textContent="Claim";m.className="msg";m.textContent=n==="x"?"Follow the account on X, come back and tap Claim.":"Join the channel, come back and tap Claim.";return}
+  if(useApi){const ok=await act("/api/tasks/"+n,m,undefined,reward);if(!ok&&m.textContent.includes("already")){doneTasks.push(n);taskUI()}return}
+  demoDone[n]=n==="daily"?today():"once";m.className="msg ok";m.textContent=reward;bal+=+b.dataset.task;render()});
+$("#rshare").onclick=()=>{const l=inviteLink||myLink();openTg("https://t.me/share/url?url="+encodeURIComponent(l)+"&text="+encodeURIComponent("Mine TON CATS with me and earn free CATS!"))};
+$("#invite").onclick=()=>{const l=inviteLink||myLink();try{navigator.clipboard.writeText(l)}catch(e){}$("#invite").textContent="Copied";setTimeout(()=>$("#invite").textContent="Copy link",1500)};
+
+let buying=null;
+document.querySelectorAll("[data-ton]").forEach(b=>b.onclick=()=>{
+  const price=+b.dataset.ton;buying={price,cats:+b.dataset.cats};$("#bmsg").textContent="";
+  $("#bpaytext").textContent="Tonkeeper is opening. Pay exactly "+price.toFixed(2)+" TON to this address, then tap the button below.";
+  $("#bpay").hidden=false;buyPay(price,b.dataset.pack)});
+$("#baddr").textContent=ADDR;
+$("#bcopy").onclick=()=>{try{navigator.clipboard.writeText(ADDR)}catch(e){}$("#bcopy").textContent="Copied";setTimeout(()=>$("#bcopy").textContent="Copy address",1500)};
+$("#bcheck").onclick=async()=>{const m=$("#bmsg");if(!buying)return;
+  if(useApi){if(await act("/api/buy/check",m,undefined,"Purchase complete. CATS added to your balance.")){$("#bpay").hidden=true;buying=null}return}
+  bal+=buying.cats;locked+=buying.cats;render();m.className="msg ok";m.textContent="Bought "+buying.cats.toLocaleString()+" CATS (demo).";$("#bpay").hidden=true;buying=null};
+
+/* ---- wallet ---- */
+function wrender(){
+  const sh=uaddr?uaddr.slice(0,4)+"…"+uaddr.slice(-4):"";
+  $("#wst").textContent=["Not connected","Connected, not verified","Verified"][wstate]+(sh?" · "+sh:"");$("#wst").className=wstate==2?"ok":"";
+  $("#conn").hidden=wstate>0;$("#vbox").hidden=wstate!=1;$("#dw").hidden=wstate!=2;if(wstate!=2)$("#panel").hidden=true;if(wstate>0)$("#cbox").hidden=true;render();if(uaddr!==balAddr){balAddr=uaddr;loadWalletTon()}
+}
+$("#addrtxt").textContent=ADDR;
+$("#copyaddr").onclick=()=>{try{navigator.clipboard.writeText(ADDR)}catch(e){}$("#copyaddr").textContent="Copied";setTimeout(()=>$("#copyaddr").textContent="Copy address",1500)};
+/* ---- TON Connect: opens Tonkeeper, connects the wallet, returns to the app (needs your server for the manifest) ---- */
+let bootRes;const bootP=new Promise(r=>bootRes=r);
+try{if(window.TON_CONNECT_UI)tc=new TON_CONNECT_UI.TonConnectUI({manifestUrl:location.origin+"/tonconnect-manifest.json",actionsConfiguration:{twaReturnUrl:"https://t.me/"+BOT}})}catch(e){tc=null}
+async function onWallet(w){
+  if(!w||!w.account)return;await bootP;let a=w.account.address;
+  try{a=TON_CONNECT_UI.toUserFriendlyAddress(a,false)}catch(e){}
+  if(a===uaddr&&wstate>0)return;
+  if(useApi)await act("/api/wallet",$("#cmsg"),{address:a});else{uaddr=a;wstate=1;wrender()}}
+if(tc)tc.onStatusChange(w=>{onWallet(w)});
+$("#conn").onclick=async()=>{
+  if(tc&&useApi){try{if(tc.connected)await onWallet(tc.wallet);else{try{await tc.openSingleWalletModal("tonkeeper")}catch(e){await tc.openModal()}}return}catch(e){}}
+  $("#cbox").hidden=false;openExt("https://app.tonkeeper.com/")};
+function commentBoc(text){const t=new TextEncoder().encode(text),n=t.length,b=[0xb5,0xee,0x9c,0x72,1,1,1,1,0,6+n,0,0,2*(4+n),0,0,0,0,...t];return btoa(String.fromCharCode(...b))}
+async function payTon(amount,text){            // pays your address from the connected wallet; falls back to a Tonkeeper link
+  if(tc&&tc.connected){
+    try{await tc.sendTransaction({validUntil:Math.floor(Date.now()/1000)+600,messages:[{address:ADDR,amount:String(Math.round(amount*1e9)),payload:commentBoc(text)}]});return true}
+    catch(e){if(/reject|cancel|declin|denied/i.test((e&&e.message)||""))return false}}
+  openExt(tonLink(amount,text));return true}
+async function autoCheck(path){                 // ask the server every 5s (up to ~70s) until the payment shows up
+  for(let i=0;i<14;i++){await new Promise(r=>setTimeout(r,5000));
+    try{applyState(await call(path));return true}catch(e){if(e.status!==404&&e.status!==400)break}}
+  return false}
+async function buyPay(price,pack){
+  if(!await payTon(price,"buy:"+pack+":"+(UID||"demo"))){$("#bmsg").className="msg bad";$("#bmsg").textContent="Payment cancelled.";return}
+  if(useApi&&await autoCheck("/api/buy/check")){$("#bmsg").className="msg ok";$("#bmsg").textContent="Purchase complete. CATS added to your balance.";$("#bpay").hidden=true;buying=null}}
+async function loadWalletTon(){
+  if(!uaddr){walletTon=null;render();return}
+  try{if(useApi)walletTon=(await call("/api/wallet/balance")).ton;
+      else{const j=await(await fetch("https://toncenter.com/api/v2/getAddressBalance?address="+encodeURIComponent(uaddr))).json();walletTon=j.ok?Number(j.result)/1e9:null}}
+  catch(e){walletTon=null}
+  render()}
+$("#csave").onclick=async()=>{const v=$("#caddr").value.trim(),m=$("#cmsg");
+  if(!/^(UQ|EQ)[A-Za-z0-9_-]{46}$/.test(v)){m.className="bad";m.textContent="Enter a valid TON address (starts with UQ or EQ).";return}
+  if(useApi){await act("/api/wallet",m,{address:v});return}
+  uaddr=v;wstate=1;wrender()};
+$("#verify").onclick=async()=>{const m=$("#vmsg");m.className="";
+  if(!await payTon(0.05,useApi?"verify:"+UID:"verify")){m.className="bad";m.textContent="Payment cancelled.";return}
+  m.textContent="Waiting for your 0.05 TON payment…";
+  if(useApi&&!await autoCheck("/api/wallet/verify")){m.className="bad";m.textContent="Payment not found yet. Tap “I paid, check” in a minute."}};
+$("#vcheck").onclick=async()=>{const b=$("#vcheck"),m=$("#vmsg");b.disabled=true;m.className="";m.textContent="Checking for your 0.05 TON payment…";
+  if(useApi){await act("/api/wallet/verify",m);b.disabled=false;return}
+  setTimeout(()=>{wstate=2;b.disabled=false;m.textContent="";wrender()},1600)};
+function openPanel(m){mode=m;paid=false;$("#panel").hidden=false;$("#pgo").textContent="Confirm";$("#ptitle").textContent=m=='dep'?"Deposit TON":"Withdraw CATS (min 100,000)";$("#amt").placeholder=m=='dep'?"Amount in TON":"Amount in CATS";$("#amt").step=m=='dep'?"0.01":"1";$("#pmsg").textContent="";$("#amt").value=m=='wo'?Math.floor(Math.max(0,bal-locked)):""}
+$("#wdo").onclick=()=>openPanel('wo');
+$("#pgo").onclick=async()=>{
+  const v=parseFloat($("#amt").value),p=$("#pmsg");
+  if(!(v>0)){p.className="bad";p.textContent="Enter an amount.";return}
+  if(mode=='dep'){
+    if(useApi){
+      if(!paid){openExt(tonLink(v,"dep:"+UID));paid=true;$("#pgo").textContent="I paid, check deposit";p.className="";p.textContent="Pay in Tonkeeper, then tap the button again.";return}
+      await act("/api/deposit/check",p,undefined,"Deposit credited.");return}
+    openExt(tonLink(v,"deposit"));tonBal+=v;p.className="ok";p.textContent="Tonkeeper opened. Pay "+v.toFixed(2)+" TON there."}
+  else if(useApi){await act("/api/withdraw",p,{amount:v},"Withdraw request sent. The admin will check it and confirm your payout.");return}
+  else if(v<100000){p.className="bad";p.textContent="Minimum withdraw is 100,000 CATS."}
+  else if(v>bal-locked){p.className="bad";p.textContent="Only "+Math.max(0,Math.floor(bal-locked)).toLocaleString()+" CATS can be withdrawn. Bought CATS are locked."}
+  else{bal-=Math.floor(v);wlist.unshift({id:wlist.length+1,amount:Math.floor(v),status:"pending"});p.className="ok";p.textContent="Withdraw request sent. The admin will check it and confirm your payout."}
+  wrender();
+};
+
+/* ---- channel gate ---- */
+const gate=$("#gate");let clicked=false;
+function showGate(on){if(on){gate.style.display="";gate.classList.remove("off")}else{gate.classList.add("off");setTimeout(()=>{gate.style.display="none"},600)}}
+try{if(localStorage.getItem("joined")==="1")gate.style.display="none"}catch(e){}
+$("#gjoin").addEventListener("click",e=>{clicked=true;$("#gmsg").textContent="";if(tg&&tg.openTelegramLink){e.preventDefault();tg.openTelegramLink(CHANNEL)}});
+$("#gchk").onclick=async()=>{const m=$("#gmsg");m.className="msg";m.textContent="Checking membership…";
+  try{
+    let ok;
+    if(useApi)ok=(await call("/api/channel/check")).member;
+    else{await new Promise(r=>setTimeout(r,1100));ok=clicked}
+    if(!ok){m.className="msg bad";m.textContent="You have not joined yet. Tap Join channel first.";return}
+    m.className="msg ok";m.textContent="Joined. Welcome!";
+    if(!useApi){try{localStorage.setItem("joined","1")}catch(e){}}
+    setTimeout(()=>showGate(false),700);
+  }catch(e){m.className="msg bad";m.textContent=e.message}};
+
+/* ---- start: use the server if it answers, otherwise stay in local demo mode ---- */
+let booted=false;
+wrender();mrender();
+(async()=>{try{
+  const s=await call("/api/auth");
+  if(typeof s.balance==="number"){useApi=true;applyState(s);const r=await call("/api/channel/check");showGate(!r.member)}
+}catch(e){if(e.status===401&&e.hasError){$("#lock").hidden=false;gate.style.display="none"}}finally{booted=true;bootRes()}})();
+
+const sp=$("#splash");
+function hideSplash(){sp.classList.add("off");setTimeout(()=>sp.remove(),700)}
+sp.onclick=()=>{if(booted)hideSplash()};
+const minMs=matchMedia("(prefers-reduced-motion:reduce)").matches?300:2000,t0=Date.now();
+const iv=setInterval(()=>{const t=Date.now()-t0;if(t>=minMs&&(booted||t>6000)){clearInterval(iv);hideSplash()}},100);
+</script>
+</body>
+</html>
